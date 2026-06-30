@@ -1,5 +1,5 @@
 {
-  "domain": "water_heater",
+  "domain": "rinnai",
   "name": "Rinnai Water Heater Integration",
   "after_dependencies": [
     "network"

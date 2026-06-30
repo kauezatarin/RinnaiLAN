@@ -2,5 +2,5 @@
 
 from datetime import timedelta
 
-DOMAIN = "rinnai_water_heater"
+DOMAIN = "rinnai"
 UPDATE_INTERVAL = timedelta(seconds=2)
