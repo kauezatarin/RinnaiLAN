@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 DOMAIN = "rinnai"
-UPDATE_INTERVAL = timedelta(seconds=2)
+UPDATE_INTERVAL = timedelta(seconds=5)
 
 SUPPORTED_TEMPS = [
     35.0,

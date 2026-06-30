@@ -14,7 +14,7 @@ from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, Device
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, SUPPORTED_TEMPS
+from .const import DOMAIN, SUPPORTED_TEMPS, UPDATE_INTERVAL
 from .coordinator import RinnaiWaterHeaterCoordinator
 
 SUPPORT_FEATURES = (
@@ -153,8 +153,8 @@ class RinnaiWaterHeaterEntity(
                         self.coordinator.update_cached_data(updates)
                         await asyncio.sleep(0.2)
             finally:
-                # Set pause for exactly 2 seconds after the commands finish, and notify UI listeners
-                self.coordinator.pause_polling(2.0)
+                # Set pause for exactly UPDATE_INTERVAL seconds after the commands finish, and notify UI listeners
+                self.coordinator.pause_polling(UPDATE_INTERVAL.seconds)
                 self.coordinator.async_update_listeners()
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
@@ -174,8 +174,8 @@ class RinnaiWaterHeaterEntity(
                 updates = await self.coordinator.api.async_toggle_power()
                 self.coordinator.update_cached_data(updates)
             finally:
-                # Set pause for exactly 2 seconds and notify UI listeners
-                self.coordinator.pause_polling(2.0)
+                # Set pause for exactly UPDATE_INTERVAL seconds and notify UI listeners
+                self.coordinator.pause_polling(UPDATE_INTERVAL.seconds)
                 self.coordinator.async_update_listeners()
 
     async def async_turn_on(self, **kwargs: Any) -> None:
