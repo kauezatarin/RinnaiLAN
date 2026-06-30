@@ -1,0 +1,63 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_invite_code": "Invalid invite code",
+            "network_prefix_not_found": "Could not determine local network prefix",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "invite": {
+                "data": {
+                    "invite_code": "Invite Code"
+                },
+                "description": "Enter the 6-digit numeric invite code."
+            },
+            "manual": {
+                "data": {
+                    "host": "Host"
+                }
+            },
+            "user": {
+                "description": "Choose how you want to configure the Rinnai Water Heater.",
+                "menu_options": {
+                    "invite": "Configure via Invite Code",
+                    "manual": "Configure Device IP Manually"
+                }
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "combustion_active": {
+                "name": "Combustion"
+            }
+        },
+        "sensor": {
+            "activations_count": {
+                "name": "Activations count"
+            },
+            "combustion_hours": {
+                "name": "Combustion hours"
+            },
+            "inlet_temperature": {
+                "name": "Inlet temperature"
+            },
+            "outlet_temperature": {
+                "name": "Outlet temperature"
+            },
+            "standby_hours": {
+                "name": "Standby hours"
+            },
+            "water_flow_rate": {
+                "name": "Water flow rate"
+            },
+            "wifi_signal": {
+                "name": "Wi-Fi signal"
+            }
+        }
+    }
+}

@@ -1,0 +1,63 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Choose how you want to configure the Rinnai Water Heater.",
+        "menu_options": {
+          "manual": "Configure Device IP Manually",
+          "invite": "Configure via Invite Code"
+        }
+      },
+      "manual": {
+        "data": {
+          "host": "[%key:common::config_flow::data::host%]"
+        }
+      },
+      "invite": {
+        "description": "Enter the 6-digit numeric invite code.",
+        "data": {
+          "invite_code": "Invite Code"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_invite_code": "Invalid invite code",
+      "network_prefix_not_found": "Could not determine local network prefix",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "combustion_active": {
+        "name": "Combustion"
+      }
+    },
+    "sensor": {
+      "inlet_temperature": {
+        "name": "Inlet temperature"
+      },
+      "outlet_temperature": {
+        "name": "Outlet temperature"
+      },
+      "water_flow_rate": {
+        "name": "Water flow rate"
+      },
+      "activations_count": {
+        "name": "Activations count"
+      },
+      "combustion_hours": {
+        "name": "Combustion hours"
+      },
+      "standby_hours": {
+        "name": "Standby hours"
+      },
+      "wifi_signal": {
+        "name": "Wi-Fi signal"
+      }
+    }
+  }
+}

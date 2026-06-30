@@ -1,0 +1,32 @@
+Fluxo de conexão qunado o app é aberto:
+/bus --> aquecedor desligado: 41,0,0,4700,135,19188,10000,0,0,0,1837,2856,0,265,195,3800,192.168.0.177,null,6,23481142,52838,0,Aug 26 2024,15,Software/System restart,3c:e9:0e:e1:75:58,0,0,1684,0,1,0,0,559,926,0,0,-62,[0],2
+
+aquecedor ligado: 42,0,1,4700,135,19206,10000,3174,2163,17830,1565,3154,750,246,176,3800,192.168.0.177,null:pri,6,23481142,113619,0,Aug 26 2024,15,Software/System restart,3c:e9:0e:e1:75:58,0,0,1684,0,1,0,0,559,926,0,0,-54,[0],2
+
+Legenda payload /bus:
+Status do aquecedor,?,Combustão ativa(bool), Numero de acionamentos,Horas combustão,Horas Standby,Auto Diagnostico da ventoinha,Rotação Ventoinha Hz,Corrente POV(mA), potencia (kcal/min), Temperatura de Entrada(c), Temperatura de Saida (c), Fluxo real (l/m), Vazão min acinamento(l/m), Vazão min desligamento(l/m), Temperatura (t/100 --> 3800/100 = 38,00), ip, ?(sempre vem null ou null:pri),?,?,?,?,Data de config talvez?, talvez um endpoint?, MAC, ?,?,?,?,?,?,?,?,?,?,?,Pot. Wifi(dBm), ?, ?
+
+/connect --> 3c:e9:0e:e1:75:58
+/read_modelo --> REUE271FEHGN3
+
+/pre_heat_set_date_time/43/18/1 --> /pre_heat_set_date_time/mm/hh/1 --> sempre vai esse 1 no final (servidor parece não responder)
+
+/hardware --> servidor parece não responder
+
+/tela_ --> 41,0,0,135,19188,0,null,6,52839,Aug 26 2024,15,0,0,0 --> Status do aquecedor,? sem pre vem 0,Combustão ativa(bool),Horas combustão,Horas Standby,Fluxo real(l/m),?(sempre vem null ou null:pri),Temperatura (t+32 --> 6+32 = 38),Conta o tempo de algo: MAS os 3 ultimos digitos são enviados no convite de acesso,Data de config talvez?,?,?,?,?
+
+Status Codes:
+11 -> Desligado
+41 -> Ligado Standby
+42 -> Ligado Aquecendo
+
+Controle do aquecedor:
+
+/lig --> alterna ligar e desligar
+/inc --> aumenta a temperatura em 1 grau
+/dec --> diminui a temperatura em 1 grau
+
+Convite de acesso:
+
+177839 --> parece ser divididdo em 2 partes
+xxx.yyy --> onde xxx são os 3 ultimos digitos do ipv4 do dispositivo na rede no exemplo acima o ip era 192.168.0.177. yyy são dos 3 ultimos digitos da posição 9 da resposta do /tela_.

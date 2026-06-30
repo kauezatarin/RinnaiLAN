@@ -1,0 +1,22 @@
+{
+  "domain": "water_heater",
+  "name": "Rinnai Water Heater Integration",
+  "after_dependencies": [
+    "network"
+  ],
+  "codeowners": [
+    "@kauezatarin"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/kauezatarin/RinnaiLAN",
+  "homekit": {},
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/kauezatarin/RinnaiLAN/issues",
+  "quality_scale": "bronze",
+  "requirements": [],
+  "ssdp": [],
+  "version": "1.0.0-beta",
+  "zeroconf": []
+}
