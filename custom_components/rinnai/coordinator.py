@@ -1,5 +1,6 @@
 """DataUpdateCoordinator for Rinnai Water Heater."""
 
+import asyncio
 import logging
 import time
 from typing import Any
@@ -33,15 +34,20 @@ class RinnaiWaterHeaterCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
         self.api = api
         self._pause_until: float | None = None
+        self.lock = asyncio.Lock()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch data from API."""
         if self._pause_until is not None and time.time() < self._pause_until:
             return self.data
-        try:
-            return await self.api.async_get_bus_data()
-        except RinnaiWaterHeaterApiError as err:
-            raise UpdateFailed(f"Error communicating with API: {err}") from err
+
+        async with self.lock:
+            if self._pause_until is not None and time.time() < self._pause_until:
+                return self.data
+            try:
+                return await self.api.async_get_bus_data()
+            except RinnaiWaterHeaterApiError as err:
+                raise UpdateFailed(f"Error communicating with API: {err}") from err
 
     def update_cached_data(self, data_updates: dict[str, Any]) -> None:
         """Update cached coordinator data with updates from control response."""

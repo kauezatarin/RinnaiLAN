@@ -60,7 +60,6 @@ class RinnaiWaterHeaterEntity(
             model=coordinator.model,
             connections={(CONNECTION_NETWORK_MAC, coordinator.mac_address)},
         )
-        self._lock = asyncio.Lock()
 
     @property
     def current_temperature(self) -> float | None:
@@ -101,7 +100,7 @@ class RinnaiWaterHeaterEntity(
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
-        async with self._lock:
+        async with self.coordinator.lock:
             target_temp = kwargs.get(ATTR_TEMPERATURE)
             if target_temp is None:
                 return
@@ -163,7 +162,7 @@ class RinnaiWaterHeaterEntity(
         if operation_mode not in self._attr_operation_list:
             raise ValueError(f"Unsupported operation mode: {operation_mode}")
 
-        async with self._lock:
+        async with self.coordinator.lock:
             current_mode = self.current_operation
             if current_mode == operation_mode:
                 return
