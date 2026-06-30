@@ -5,6 +5,8 @@ from typing import Any
 
 import aiohttp
 
+from .const import RAW_TO_TEMP
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -128,8 +130,9 @@ def parse_tela_data(data_str: str) -> dict[str, Any]:
         combustion_active = parts[2] == "1"
         combustion_hours = int(parts[3])
         standby_hours = int(parts[4])
-        # Position 7 is configured temperature offset by 32
-        target_temp = float(int(parts[7]) + 32)
+        # Position 7 is configured temperature
+        raw_temp = int(parts[7])
+        target_temp = RAW_TO_TEMP.get(raw_temp, float(raw_temp + 32))
     except (ValueError, IndexError) as err:
         raise RinnaiWaterHeaterApiError(
             f"Error parsing control payload: {err}"

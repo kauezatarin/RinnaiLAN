@@ -13,7 +13,25 @@ Status do aquecedor,?,Combustão ativa(bool), Numero de acionamentos,Horas combu
 
 /hardware --> servidor parece não responder
 
-/tela_ --> 41,0,0,135,19188,0,null,6,52839,Aug 26 2024,15,0,0,0 --> Status do aquecedor,? sem pre vem 0,Combustão ativa(bool),Horas combustão,Horas Standby,Fluxo real(l/m),?(sempre vem null ou null:pri),Temperatura (t+32 --> 6+32 = 38),Conta o tempo de algo: MAS os 3 ultimos digitos são enviados no convite de acesso,Data de config talvez?,?,?,?,?
+/tela_ --> 41,0,0,135,19188,0,null,6,52839,Aug 26 2024,15,0,0,0 --> Status do aquecedor,? sem pre vem 0,Combustão ativa(bool),Horas combustão,Horas Standby,Fluxo real(l/m),?(sempre vem null ou null:pri),Temperatura (veja valores na tabela),Conta o tempo de algo: MAS os 3 ultimos digitos são enviados no convite de acesso,Data de config talvez?,?,?,?,?
+
+Tabela de temperatura:
+3 -> 35
+4 -> 36
+5 -> 37
+6 -> 38
+7 -> 39
+8 -> 40
+9 -> 41
+10 -> 42
+11 -> 43
+12 -> 44
+13 -> 45
+14 -> 46
+16 -> 48
+18 -> 50
+19 -> 55
+20 -> 60
 
 Status Codes:
 11 -> Desligado

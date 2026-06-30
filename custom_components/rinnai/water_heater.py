@@ -14,7 +14,7 @@ from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC, Device
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, SUPPORTED_TEMPS
 from .coordinator import RinnaiWaterHeaterCoordinator
 
 SUPPORT_FEATURES = (
@@ -108,7 +108,32 @@ class RinnaiWaterHeaterEntity(
         if current_target_temp is None:
             return
 
-        diff = int(target_temp) - int(current_target_temp)
+        # Ensure current_target_temp is in SUPPORTED_TEMPS
+        if current_target_temp not in SUPPORTED_TEMPS:
+            current_target_temp = min(
+                SUPPORTED_TEMPS, key=lambda x: abs(x - current_target_temp)
+            )
+
+        # Find target supported temperature, rounding in the direction of change
+        target_supported_temp = target_temp
+        if target_temp not in SUPPORTED_TEMPS:
+            if target_temp > current_target_temp:
+                # Find first supported temp >= target_temp
+                target_supported_temp = next(
+                    (t for t in SUPPORTED_TEMPS if t >= target_temp),
+                    SUPPORTED_TEMPS[-1],
+                )
+            else:
+                # Find last supported temp <= target_temp
+                target_supported_temp = next(
+                    (t for t in reversed(SUPPORTED_TEMPS) if t <= target_temp),
+                    SUPPORTED_TEMPS[0],
+                )
+
+        current_idx = SUPPORTED_TEMPS.index(current_target_temp)
+        target_idx = SUPPORTED_TEMPS.index(target_supported_temp)
+        diff = target_idx - current_idx
+
         if diff == 0:
             return
 
