@@ -2,10 +2,10 @@
 
 from unittest.mock import AsyncMock, patch
 
+from custom_components.rinnai.const import DOMAIN
 import pytest
 
 from homeassistant import config_entries
-from custom_components.rinnai.const import DOMAIN
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType

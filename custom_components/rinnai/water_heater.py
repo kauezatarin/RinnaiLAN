@@ -60,6 +60,7 @@ class RinnaiWaterHeaterEntity(
             model=coordinator.model,
             connections={(CONNECTION_NETWORK_MAC, coordinator.mac_address)},
         )
+        self._lock = asyncio.Lock()
 
     @property
     def current_temperature(self) -> float | None:
@@ -100,81 +101,83 @@ class RinnaiWaterHeaterEntity(
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
         """Set new target temperature."""
-        target_temp = kwargs.get(ATTR_TEMPERATURE)
-        if target_temp is None:
-            return
+        async with self._lock:
+            target_temp = kwargs.get(ATTR_TEMPERATURE)
+            if target_temp is None:
+                return
 
-        current_target_temp = self.coordinator.data.get("target_temp")
-        if current_target_temp is None:
-            return
+            current_target_temp = self.coordinator.data.get("target_temp")
+            if current_target_temp is None:
+                return
 
-        # Ensure current_target_temp is in SUPPORTED_TEMPS
-        if current_target_temp not in SUPPORTED_TEMPS:
-            current_target_temp = min(
-                SUPPORTED_TEMPS, key=lambda x: abs(x - current_target_temp)
-            )
-
-        # Find target supported temperature, rounding in the direction of change
-        target_supported_temp = target_temp
-        if target_temp not in SUPPORTED_TEMPS:
-            if target_temp > current_target_temp:
-                # Find first supported temp >= target_temp
-                target_supported_temp = next(
-                    (t for t in SUPPORTED_TEMPS if t >= target_temp),
-                    SUPPORTED_TEMPS[-1],
-                )
-            else:
-                # Find last supported temp <= target_temp
-                target_supported_temp = next(
-                    (t for t in reversed(SUPPORTED_TEMPS) if t <= target_temp),
-                    SUPPORTED_TEMPS[0],
+            # Ensure current_target_temp is in SUPPORTED_TEMPS
+            if current_target_temp not in SUPPORTED_TEMPS:
+                current_target_temp = min(
+                    SUPPORTED_TEMPS, key=lambda x: abs(x - current_target_temp)
                 )
 
-        current_idx = SUPPORTED_TEMPS.index(current_target_temp)
-        target_idx = SUPPORTED_TEMPS.index(target_supported_temp)
-        diff = target_idx - current_idx
+            # Find target supported temperature, rounding in the direction of change
+            target_supported_temp = target_temp
+            if target_temp not in SUPPORTED_TEMPS:
+                if target_temp > current_target_temp:
+                    # Find first supported temp >= target_temp
+                    target_supported_temp = next(
+                        (t for t in SUPPORTED_TEMPS if t >= target_temp),
+                        SUPPORTED_TEMPS[-1],
+                    )
+                else:
+                    # Find last supported temp <= target_temp
+                    target_supported_temp = next(
+                        (t for t in reversed(SUPPORTED_TEMPS) if t <= target_temp),
+                        SUPPORTED_TEMPS[0],
+                    )
 
-        if diff == 0:
-            return
+            current_idx = SUPPORTED_TEMPS.index(current_target_temp)
+            target_idx = SUPPORTED_TEMPS.index(target_supported_temp)
+            diff = target_idx - current_idx
 
-        # Pause automatic polling during command execution
-        self.coordinator.pause_polling(60.0)
+            if diff == 0:
+                return
 
-        try:
-            if diff > 0:
-                for _ in range(diff):
-                    updates = await self.coordinator.api.async_increment_temp()
-                    self.coordinator.update_cached_data(updates)
-                    await asyncio.sleep(0.2)
-            else:
-                for _ in range(abs(diff)):
-                    updates = await self.coordinator.api.async_decrement_temp()
-                    self.coordinator.update_cached_data(updates)
-                    await asyncio.sleep(0.2)
-        finally:
-            # Set pause for exactly 2 seconds after the commands finish, and notify UI listeners
-            self.coordinator.pause_polling(2.0)
-            self.coordinator.async_update_listeners()
+            # Pause automatic polling during command execution
+            self.coordinator.pause_polling(60.0)
+
+            try:
+                if diff > 0:
+                    for _ in range(diff):
+                        updates = await self.coordinator.api.async_increment_temp()
+                        self.coordinator.update_cached_data(updates)
+                        await asyncio.sleep(0.2)
+                else:
+                    for _ in range(abs(diff)):
+                        updates = await self.coordinator.api.async_decrement_temp()
+                        self.coordinator.update_cached_data(updates)
+                        await asyncio.sleep(0.2)
+            finally:
+                # Set pause for exactly 2 seconds after the commands finish, and notify UI listeners
+                self.coordinator.pause_polling(2.0)
+                self.coordinator.async_update_listeners()
 
     async def async_set_operation_mode(self, operation_mode: str) -> None:
         """Set new target operation mode."""
         if operation_mode not in self._attr_operation_list:
             raise ValueError(f"Unsupported operation mode: {operation_mode}")
 
-        current_mode = self.current_operation
-        if current_mode == operation_mode:
-            return
+        async with self._lock:
+            current_mode = self.current_operation
+            if current_mode == operation_mode:
+                return
 
-        # Pause automatic polling
-        self.coordinator.pause_polling(60.0)
+            # Pause automatic polling
+            self.coordinator.pause_polling(60.0)
 
-        try:
-            updates = await self.coordinator.api.async_toggle_power()
-            self.coordinator.update_cached_data(updates)
-        finally:
-            # Set pause for exactly 2 seconds and notify UI listeners
-            self.coordinator.pause_polling(2.0)
-            self.coordinator.async_update_listeners()
+            try:
+                updates = await self.coordinator.api.async_toggle_power()
+                self.coordinator.update_cached_data(updates)
+            finally:
+                # Set pause for exactly 2 seconds and notify UI listeners
+                self.coordinator.pause_polling(2.0)
+                self.coordinator.async_update_listeners()
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the water heater on."""
