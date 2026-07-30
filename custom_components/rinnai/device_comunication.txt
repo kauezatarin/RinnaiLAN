@@ -48,3 +48,6 @@ Convite de acesso:
 
 177839 --> parece ser divididdo em 2 partes
 xxx.yyy --> onde xxx são os 3 ultimos digitos do ipv4 do dispositivo na rede no exemplo acima o ip era 192.168.0.177. yyy são dos 3 ultimos digitos da posição 9 da resposta do /tela_.
+
+Descoberta de IP do aquecedor após configuração:
+ - Em algumas redes o IP do aquecedor pode mudar, quando isso ocorre podemos descobrir o novo IP realizando broadcast UDP do payload de 2 bytes "IP" para a porta 8080.
