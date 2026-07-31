@@ -39,7 +39,7 @@ Home Assistant custom integration for controlling and monitoring **Rinnai Wi-Fi 
 
 ## Supported Devices
 
-- Rinnai Water Heaters equipped with official Wi-Fi modules (such as **REUE271FEHGN3** and compatible series).
+- Tested with Rinnai Wifi Module ROU0031.
 
 ---
 
@@ -52,7 +52,7 @@ Home Assistant custom integration for controlling and monitoring **Rinnai Wi-Fi 
 1. Ensure [HACS](https://hacs.xyz/) is installed in your Home Assistant instance.
 2. In HACS, go to **Integrations** > click the **3 dots** (top right) > **Custom repositories**.
 3. Add `https://github.com/kauezatarin/RinnaiLAN` as an **Integration** repository.
-4. Search for **Rinnai Water Heater Integration** and click **Download**.
+4. Search for **Rinnai Lan** and click **Download**.
 5. Restart Home Assistant.
 
 ### Option 2: Manual Installation
