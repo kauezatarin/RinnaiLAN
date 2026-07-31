@@ -1,9 +1,24 @@
 """Common fixtures for the Rinnai Water Heater Integration tests."""
 
+import os
 from collections.abc import Generator
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from homeassistant import loader
+from homeassistant.core import HomeAssistant
+
+
+@pytest.fixture(autouse=True)
+def enable_custom_integrations(hass: HomeAssistant) -> None:
+    """Enable custom integration in test environment by symlinking into config_dir."""
+    custom_components_dir = Path(hass.config.config_dir) / "custom_components"
+    custom_components_dir.mkdir(parents=True, exist_ok=True)
+    rinnai_target = custom_components_dir / "rinnai"
+    if not rinnai_target.exists():
+        os.symlink("/workspaces/RinnaiLAN/custom_components/rinnai", rinnai_target)
+    hass.data.pop(loader.DATA_CUSTOM_COMPONENTS, None)
 
 
 @pytest.fixture

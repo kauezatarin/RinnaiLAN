@@ -5,7 +5,6 @@ import re
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant.components.network import async_get_source_ip
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST

@@ -101,6 +101,11 @@ class RinnaiWaterHeaterApi:
             "wifi_signal": wifi_signal,
         }
 
+    def update_host(self, new_host: str) -> None:
+        """Update host and base url for API client."""
+        self.host = new_host
+        self.base_url = f"http://{new_host}"
+
     async def async_toggle_power(self) -> dict[str, Any]:
         """Toggle power status and return parsed response."""
         res_str = await self._async_request("/lig")
@@ -115,6 +120,49 @@ class RinnaiWaterHeaterApi:
         """Decrement target temperature by 1 degree and return parsed response."""
         res_str = await self._async_request("/dec")
         return parse_tela_data(res_str)
+
+    async def async_discover_devices_udp(
+        self, hass: Any, local_ip: str | None = None
+    ) -> list[str]:
+        """Perform UDP broadcast discovery to find Rinnai device IPs."""
+        return await hass.async_add_executor_job(
+            discover_devices_udp_sync, local_ip, 5.0
+        )
+
+
+def discover_devices_udp_sync(
+    local_ip: str | None = None, timeout: float = 5.0
+) -> list[str]:
+    """Perform a UDP broadcast to discover Rinnai water heater IPs on port 8080."""
+    import socket
+
+    discovered_ips: list[str] = []
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        if local_ip:
+            sock.bind((local_ip, 0))
+        else:
+            sock.bind(("", 0))
+        sock.settimeout(timeout)
+        _LOGGER.debug("Sending UDP broadcast 'IP' to port 8080...")
+        sock.sendto(b"IP", ("<broadcast>", 8080))
+
+        while True:
+            try:
+                data, addr = sock.recvfrom(1024)
+                ip = addr[0]
+                _LOGGER.debug("Received UDP broadcast response from %s: %r", ip, data)
+                if ip not in discovered_ips:
+                    discovered_ips.append(ip)
+            except TimeoutError:
+                break
+    except OSError as err:
+        _LOGGER.warning("Error during UDP broadcast discovery: %s", err)
+    finally:
+        sock.close()
+
+    return discovered_ips
 
 
 def parse_tela_data(data_str: str) -> dict[str, Any]:

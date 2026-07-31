@@ -43,7 +43,6 @@ class RinnaiWaterHeaterEntity(
     _attr_name = None
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_supported_features = SUPPORT_FEATURES
-    _attr_operation_list = ["on", "off"]
     _attr_min_temp = 35.0
     _attr_max_temp = 60.0
     _attr_target_temperature_step = 1.0
@@ -52,6 +51,7 @@ class RinnaiWaterHeaterEntity(
     def __init__(self, coordinator: RinnaiWaterHeaterCoordinator) -> None:
         """Initialize the water heater entity."""
         super().__init__(coordinator)
+        self._attr_operation_list = ["on", "off"]
         self._attr_unique_id = coordinator.mac_address
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, coordinator.mac_address)},
