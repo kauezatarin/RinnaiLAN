@@ -66,7 +66,7 @@ class RinnaiWaterHeaterCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 ):
                     self._last_discovery_time = now
                     _LOGGER.warning(
-                        "Connection to Rinnai Water Heater at %s failed %d times. Attempting UDP discovery...",
+                        "Connection to Rinnai Water Heater at %s failed %d times. Attempting UDP discovery",
                         self.api.host,
                         self._consecutive_failures,
                     )
@@ -85,7 +85,7 @@ class RinnaiWaterHeaterCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         """Discover new IP via UDP broadcast and update config entry if MAC matches."""
         try:
             local_ip = await async_get_source_ip(self.hass)
-        except (OSError, HomeAssistantError):
+        except OSError, HomeAssistantError:
             local_ip = None
 
         candidate_ips = await self.api.async_discover_devices_udp(self.hass, local_ip)

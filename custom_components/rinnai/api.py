@@ -1,9 +1,12 @@
 """API client for Rinnai Water Heater."""
 
 import logging
+import socket
 from typing import Any
 
 import aiohttp
+from homeassistant.components.network import async_get_source_ip
+from homeassistant.core import HomeAssistant
 
 from .const import RAW_TO_TEMP
 
@@ -122,9 +125,15 @@ class RinnaiWaterHeaterApi:
         return parse_tela_data(res_str)
 
     async def async_discover_devices_udp(
-        self, hass: Any, local_ip: str | None = None
+        self, hass: HomeAssistant, local_ip: str | None = None
     ) -> list[str]:
         """Perform UDP broadcast discovery to find Rinnai device IPs."""
+        if not local_ip and hass:
+            try:
+                local_ip = await async_get_source_ip(hass)
+            except OSError, RuntimeError:
+                local_ip = None
+
         return await hass.async_add_executor_job(
             discover_devices_udp_sync, local_ip, 5.0
         )
@@ -134,18 +143,29 @@ def discover_devices_udp_sync(
     local_ip: str | None = None, timeout: float = 5.0
 ) -> list[str]:
     """Perform a UDP broadcast to discover Rinnai water heater IPs on port 8080."""
-    import socket
 
     discovered_ips: list[str] = []
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        bound = False
         if local_ip:
-            sock.bind((local_ip, 0))
-        else:
+            try:
+                sock.bind((local_ip, 0))
+                bound = True
+            except OSError as err:
+                _LOGGER.debug(
+                    "Could not bind UDP socket to local IP %s: %s", local_ip, err
+                )
+
+        if not bound:
             sock.bind(("", 0))
+
         sock.settimeout(timeout)
-        _LOGGER.debug("Sending UDP broadcast 'IP' to port 8080...")
+        _LOGGER.debug(
+            "Sending UDP broadcast 'IP' from %s to port 8080",
+            local_ip if bound else "0.0.0.0",
+        )
         sock.sendto(b"IP", ("<broadcast>", 8080))
 
         while True:
